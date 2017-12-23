@@ -4,6 +4,7 @@ import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 @Entity(tableName = "shopping_list")
@@ -18,11 +19,10 @@ data class ShoppingList(
         @ColumnInfo(name = "timestamp")
         val timestamp: Date,
         @ColumnInfo(name = "items")
-        val items: List<ShoppingListItem>
+        val items: ArrayList<ShoppingListItem>
 )
 
 data class ShoppingListItem(
         val name: String,
-        val quantity: Int,
         val isCompleted: Boolean
 )

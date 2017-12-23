@@ -4,10 +4,8 @@ import android.arch.persistence.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.*
+import kotlin.collections.ArrayList
 
-/**
- * Created by Admin on 2017-12-23.
- */
 class ShoppingListDatabaseConverters {
     @TypeConverter
     fun fromTimestamp(value: Long?): Date? {
@@ -20,18 +18,18 @@ class ShoppingListDatabaseConverters {
     }
 
     @TypeConverter
-    fun stringToShoppingListItems(json: String): List<ShoppingListItem> {
+    fun stringToShoppingListItems(json: String): ArrayList<ShoppingListItem> {
 
         val gson = Gson()
-        val shoppingListItems : List<ShoppingListItem> = gson.fromJson(json, object : TypeToken<List<ShoppingListItem>>() {}.type)
+        val shoppingListItems : ArrayList<ShoppingListItem> = gson.fromJson(json, object : TypeToken<ArrayList<ShoppingListItem>>() {}.type)
 
         return shoppingListItems
     }
 
     @TypeConverter
-    fun shoppingListItemsToString(list: List<ShoppingListItem>): String {
+    fun shoppingListItemsToString(list: ArrayList<ShoppingListItem>): String {
         val gson = Gson()
-        val type = object : TypeToken<List<ShoppingListItem>>() {
+        val type = object : TypeToken<ArrayList<ShoppingListItem>>() {
 
         }.type
         return gson.toJson(list, type)

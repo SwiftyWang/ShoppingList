@@ -4,9 +4,7 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import com.konradszewczuk.shoppinglistapp.db.ShoppingListDao
 
-/**
- * Created by Admin on 2017-12-22.
- */
+
 class ViewModelFactory(private val dataSource: ShoppingListDao) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

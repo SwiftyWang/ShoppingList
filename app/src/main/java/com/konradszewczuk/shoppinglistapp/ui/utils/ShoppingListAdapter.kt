@@ -1,4 +1,4 @@
-package com.konradszewczuk.shoppinglistapp.ui
+package com.konradszewczuk.shoppinglistapp.ui.utils
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -9,11 +9,10 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.konradszewczuk.shoppinglistapp.R
+import com.konradszewczuk.shoppinglistapp.ui.ShoppingListItem
 
-/**
- * Created by Admin on 2017-12-22.
- */
-class ShoppingListAdapter(val list: ArrayList<Item>, val context: Context) : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>() {
+
+class ShoppingListAdapter(val list: ArrayList<ShoppingListItem>, val context: Context, val listener: RecyclerViewClickListener) : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>() {
 
     override fun getItemCount(): Int {
         return list.count()
@@ -27,17 +26,21 @@ class ShoppingListAdapter(val list: ArrayList<Item>, val context: Context) : Rec
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent?.getContext())
                 .inflate(R.layout.item_shopping_list, parent, false)
-        return ViewHolder(itemView)
+        return ViewHolder(itemView, listener)
     }
 
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class ViewHolder(view: View, clickListener: RecyclerViewClickListener) : RecyclerView.ViewHolder(view), View.OnClickListener {
+
+
         var name: TextView
         var description: TextView
         var price: TextView
         var thumbnail: ImageView
         var viewBackground: RelativeLayout
         var viewForeground: RelativeLayout
+        private var viewClickListener: RecyclerViewClickListener? = null
+
 
         init {
             name = view.findViewById(R.id.name)
@@ -46,6 +49,13 @@ class ShoppingListAdapter(val list: ArrayList<Item>, val context: Context) : Rec
             thumbnail = view.findViewById(R.id.thumbnail)
             viewBackground = view.findViewById(R.id.view_background)
             viewForeground = view.findViewById(R.id.view_foreground)
+            viewClickListener = clickListener
+            view.setOnClickListener(this)
+        }
+
+        override fun onClick(v: View) {
+            viewClickListener?.onClick(v, adapterPosition)
+
         }
     }
 
@@ -57,9 +67,9 @@ class ShoppingListAdapter(val list: ArrayList<Item>, val context: Context) : Rec
         notifyItemRemoved(position)
     }
 
-    fun restoreItem(item: Item, position: Int) {
-        list.add(position, item)
-        // notify item added by position
+    fun restoreItem(shoppingListItem: ShoppingListItem, position: Int) {
+        list.add(position, shoppingListItem)
+        // notify shoppingListItem added by position
         notifyItemInserted(position)
     }
 }

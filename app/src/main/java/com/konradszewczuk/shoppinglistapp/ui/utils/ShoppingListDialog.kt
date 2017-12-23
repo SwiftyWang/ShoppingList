@@ -1,4 +1,4 @@
-package com.konradszewczuk.shoppinglistapp.ui
+package com.konradszewczuk.shoppinglistapp.ui.utils
 
 import android.content.Context
 import android.content.DialogInterface
@@ -8,9 +8,7 @@ import android.view.LayoutInflater
 import com.konradszewczuk.shoppinglistapp.R
 
 
-/**
- * Created by Admin on 2017-12-23.
- */
+
 class ShoppingListDialog(val context: Context) {
 
     fun getShoppingListDialog(): AlertDialog? {
