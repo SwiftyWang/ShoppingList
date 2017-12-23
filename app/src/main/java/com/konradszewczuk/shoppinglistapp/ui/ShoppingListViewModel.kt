@@ -5,16 +5,10 @@ import com.konradszewczuk.shoppinglistapp.db.ShoppingList
 import com.konradszewczuk.shoppinglistapp.db.ShoppingListDao
 import com.konradszewczuk.shoppinglistapp.db.ShoppingListItem
 import io.reactivex.Flowable
-import io.reactivex.Single
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel() {
-
-    private fun updateShoppingLists(listName: String){
-//        dataSource.updateShoppingList()
-    }
 
     fun createShoppingList(listName: String){
         val arrayList = ArrayList<ShoppingListItem>()
@@ -28,18 +22,11 @@ class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel
                 .subscribe {
                     shoppingList: ShoppingList ->
                     val items = shoppingList.items
-                    items.add(ShoppingListItem(itemName, false))
+                     items.add(ShoppingListItem(itemName, false, Date()))
+
                     dataSource.updateShoppingList(shoppingList = shoppingList)
                 }
     }
-
-    //TODO remove(only for testing)
-    fun createArchiveList(listName: String){
-        val arrayList = ArrayList<ShoppingListItem>()
-        val shoppingList = ShoppingList(name = listName, isArchived = true, items = arrayList, timestamp = Date())
-        dataSource.insertShoppingList(shoppingList)
-    }
-
 
     fun getShoppingLists(): Flowable<List<ShoppingList>> {
         return dataSource.getActiveShoppingLists()
@@ -53,7 +40,6 @@ class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel
                 .map {
                     t -> t.sortedByDescending { it.timestamp }
                 }
-
 
     }
 
@@ -69,5 +55,41 @@ class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel
     fun reArchiveItem(deletedShoppingListItem: com.konradszewczuk.shoppinglistapp.ui.ShoppingListItem){
 
         dataSource.reArchiveShoppingList(deletedShoppingListItem.id)
+    }
+
+    fun removeShoppingListItem(deletedItem: ShoppingListElementItem, shoppingListId: Int) {
+        dataSource.getShoppingList(shoppingListId)
+                .firstElement()
+                .subscribe {
+                    shoppingList: ShoppingList ->
+                    val items: ArrayList<ShoppingListItem> = shoppingList.items
+
+                    val filter = items.filter {
+                        it.timestamp != deletedItem.timestamp
+                    }
+
+                    dataSource.updateShoppingList(shoppingList = ShoppingList(id = shoppingList.id,
+                            name = shoppingList.name,
+                            isArchived = shoppingList.isArchived,
+                            timestamp = shoppingList.timestamp,
+                            items = filter as ArrayList<ShoppingListItem>
+                            ))
+                }
+    }
+
+    fun restoreShoppingListItem(deletedItem: ShoppingListElementItem, shoppingListId: Int) {
+        dataSource.getShoppingList(shoppingListId)
+                .firstElement()
+                .subscribe {
+                    shoppingList: ShoppingList ->
+                    val items = shoppingList.items
+                    items.add(ShoppingListItem(deletedItem.name, deletedItem.isCompleted, deletedItem.timestamp))
+                    dataSource.updateShoppingList(shoppingList = ShoppingList(id = shoppingList.id,
+                            name = shoppingList.name,
+                            isArchived = shoppingList.isArchived,
+                            timestamp = shoppingList.timestamp,
+                            items = items
+                    ))
+                }
     }
 }

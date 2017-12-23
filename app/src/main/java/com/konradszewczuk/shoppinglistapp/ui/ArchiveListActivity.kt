@@ -21,9 +21,9 @@ import kotlinx.android.synthetic.main.activity_main.*
 class ArchiveListActivity : AppCompatActivity(), RecyclerViewClickListener {
     override fun onClick(view: View, position: Int) {
         val id = shoppingList.get(position).id
-        goToShoppingListDetailsActivity(id)
+        val isArchived = shoppingList.get(position).isArchived
+        goToShoppingListDetailsActivity(id, isArchived)
     }
-
 
     private lateinit var viewModelFactory: ViewModelFactory
 
@@ -54,12 +54,12 @@ class ArchiveListActivity : AppCompatActivity(), RecyclerViewClickListener {
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         recyclerView.setAdapter(mAdapter)
 
-
     }
 
-    private fun goToShoppingListDetailsActivity(id: Int) {
+    private fun goToShoppingListDetailsActivity(id: Int, isArchived: Boolean) {
         val intent = Intent(this, ShoppingListDetailsActivity::class.java)
         intent.putExtra("id", id)
+        intent.putExtra("isArchived", isArchived)
         startActivity(intent)
     }
 
@@ -75,7 +75,7 @@ class ArchiveListActivity : AppCompatActivity(), RecyclerViewClickListener {
                     progressBar.visibility = View.GONE
                     shoppingList.clear()
                     t?.forEach {
-                        val item = ShoppingListItem(it.id, it.name, it.timestamp)
+                        val item = ShoppingListItem(it.id, it.name, it.timestamp, it.isArchived)
                         shoppingList.add(item)
                     }
 

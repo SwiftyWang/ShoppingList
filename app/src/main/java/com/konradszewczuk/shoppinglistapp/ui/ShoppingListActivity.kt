@@ -22,7 +22,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
-import android.widget.Toast
 import com.konradszewczuk.shoppinglistapp.Injection
 import com.konradszewczuk.shoppinglistapp.R
 import com.konradszewczuk.shoppinglistapp.ui.utils.RecyclerItemTouchHelper
@@ -42,7 +41,8 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
 
     override fun onClick(view: View, position: Int) {
         val id = shoppingList.get(position).id
-        goToShoppingListDetailsActivity(id)
+        val isArchived = shoppingList.get(position).isArchived
+        goToShoppingListDetailsActivity(id, isArchived)
     }
 
     private lateinit var viewModelFactory: ViewModelFactory
@@ -139,7 +139,7 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
                 .subscribe({ t ->
                     shoppingList.clear()
                     t?.forEach {
-                        val item = ShoppingListItem(it.id, it.name, it.timestamp)
+                        val item = ShoppingListItem(it.id, it.name, it.timestamp, it.isArchived)
                         shoppingList.add(item)
                     }
 
@@ -161,9 +161,10 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
         startActivity(intent)
     }
 
-    private fun goToShoppingListDetailsActivity(id: Int) {
+    private fun goToShoppingListDetailsActivity(id: Int, isArchived: Boolean) {
         val intent = Intent(this, ShoppingListDetailsActivity::class.java)
         intent.putExtra("id", id)
+        intent.putExtra("isArchived", isArchived)
         startActivity(intent)
     }
 

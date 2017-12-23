@@ -13,7 +13,7 @@ import com.konradszewczuk.shoppinglistapp.ui.ShoppingListElementItem
 /**
  * Created by Admin on 2017-12-23.
  */
-class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementItem>, val context: Context, val listener: RecyclerViewClickListener) : RecyclerView.Adapter<ShoppingListDetailsAdapter.ViewHolder>() {
+class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementItem>, val context: Context, val listener: RecyclerViewClickListener, val isArchived: Boolean) : RecyclerView.Adapter<ShoppingListDetailsAdapter.ViewHolder>() {
 
     override fun getItemCount(): Int {
         return list.count()
@@ -27,7 +27,24 @@ class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementItem>, v
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val item = list.get(position)
-        holder?.name?.setText(item.name)      }
+        holder?.name?.setText(item.name)
+        if(item.isCompleted){
+            holder?.isCompleted?.isChecked = true
+        }
+        else{
+            holder?.isCompleted?.isChecked = false
+        }
+
+        if(isArchived)
+        holder?.isCompleted?.isEnabled = false
+        else{
+            holder?.isCompleted?.isEnabled = true
+        }
+
+        holder?.isCompleted?.setOnCheckedChangeListener{
+            buttonView, isChecked ->
+        }
+    }
 
 
     inner class ViewHolder(view: View, clickListener: RecyclerViewClickListener) : RecyclerView.ViewHolder(view), View.OnClickListener {

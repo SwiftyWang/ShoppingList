@@ -24,5 +24,6 @@ data class ShoppingList(
 
 data class ShoppingListItem(
         val name: String,
-        val isCompleted: Boolean
+        val isCompleted: Boolean,
+        val timestamp: Date
 )

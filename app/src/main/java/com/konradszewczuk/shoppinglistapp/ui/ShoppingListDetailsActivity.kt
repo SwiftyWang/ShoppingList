@@ -3,7 +3,9 @@ package com.konradszewczuk.shoppinglistapp.ui
 import android.arch.lifecycle.ViewModelProviders
 import android.content.DialogInterface
 import android.graphics.Canvas
+import android.graphics.Color
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
@@ -23,14 +25,14 @@ import com.konradszewczuk.shoppinglistapp.ui.utils.ShoppingListDetailsAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-
 import kotlinx.android.synthetic.main.activity_shopping_list_item.*
+
 import kotlinx.android.synthetic.main.content_shopping_list_item.*
 import java.util.*
 
 class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, RecyclerViewClickListener {
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int, position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Log.v("GOWNO", "GOWNO")
     }
 
     override fun onClick(view: View, position: Int) {
@@ -38,18 +40,12 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
     }
 
     private lateinit var viewModelFactory: ViewModelFactory
-
     private lateinit var viewModel: ShoppingListViewModel
-
-    private  var intExtra: Int? = null
-
+    private var intExtra: Int? = null
+    private var isArchived: Boolean? = null
     private val disposable = CompositeDisposable()
-
     private var shoppingList = ArrayList<ShoppingListElementItem>()
-
     private var mAdapter: ShoppingListDetailsAdapter? = null
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,11 +55,12 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         intExtra = getIntent().getIntExtra("id", 0)
+        isArchived = getIntent().getBooleanExtra("isArchived", false)
 
         viewModelFactory = Injection.provideViewModelFactory(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShoppingListViewModel::class.java)
 
-        mAdapter = ShoppingListDetailsAdapter(shoppingList, this, this)
+        mAdapter = ShoppingListDetailsAdapter(shoppingList, this, this, isArchived!!)
 
         val mLayoutManager = LinearLayoutManager(applicationContext)
         recyclerView.setLayoutManager(mLayoutManager)
@@ -71,12 +68,13 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         recyclerView.setAdapter(mAdapter)
 
+        if (isArchived as Boolean) {
+            fab.visibility = View.GONE
+        }
+
         fab.setOnClickListener { view ->
             val alertDialogAndroid = getShoppingListDialog()
             alertDialogAndroid?.show()
-
-//      Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show()
 
         }
 
@@ -98,20 +96,21 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
 
                     // remove the item from recycler view
                     mAdapter?.removeItem(viewHolder.adapterPosition)
+                    viewModel.removeShoppingListItem(deletedItem, intExtra!!)
 
 
                     // showing snack bar with Undo option
-//                    val snackbar = Snackbar
-//                            .make(coordinatorLayout, name + " is archived!", Snackbar.LENGTH_LONG)
-//                    snackbar.setAction("UNDO", View.OnClickListener {
-//                        // undo is selected, restore the deleted item
-//                        mAdapter?.restoreItem(deletedItem, deletedIndex)
-//
-//                    })
-//                    snackbar.setActionTextColor(Color.YELLOW)
-//                    snackbar.show()
+                    val snackbar = Snackbar
+                            .make(coordinatorLayout, name + " is deleted!", Snackbar.LENGTH_LONG)
+                    snackbar.setAction("UNDO", View.OnClickListener {
+                        // undo is selected, restore the deleted item
+                        mAdapter?.restoreItem(deletedItem, deletedIndex)
+                        viewModel.restoreShoppingListItem(deletedItem, intExtra!!)
+                    })
+                    snackbar.setActionTextColor(Color.YELLOW)
+                    snackbar.show()
                 }
-                Log.v("Test" ,"test")
+                Log.v("Test", "test")
             }
 
             override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
@@ -119,10 +118,8 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
             }
         }
 
-//      new ItemTouchHelper(itemTouchHelperCallback1).attachToRecyclerView(recyclerView);
-        ItemTouchHelper(itemTouchHelperCallback1).attachToRecyclerView(recyclerView)
-
-//        viewModel.createArchiveList("Archived")
+        if (!isArchived!!)
+            ItemTouchHelper(itemTouchHelperCallback1).attachToRecyclerView(recyclerView)
     }
 
 
@@ -133,19 +130,19 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
 
     override fun onStart() {
         super.onStart()
-        if(intExtra != null)
-        viewModel.getShoppingList(intExtra!!)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ t ->
-                    shoppingList.clear()
-                    t.items.forEach {
-                        val item = ShoppingListElementItem(0, it.name, false)
-                        shoppingList.add(item)
-                    }
+        if (intExtra != null)
+            viewModel.getShoppingList(intExtra!!)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ t ->
+                        shoppingList.clear()
+                        t.items.forEach {
+                            val item = ShoppingListElementItem(0, it.name, false, it.timestamp)
+                            shoppingList.add(item)
+                        }
 
-                    mAdapter?.notifyDataSetChanged()
-                })
+                        mAdapter?.notifyDataSetChanged()
+                    })
 
     }
 
@@ -156,9 +153,6 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
         disposable.clear()
     }
 
-    companion object {
-        private val TAG = ShoppingListActivity::class.java.simpleName
-    }
 
     fun getShoppingListDialog(): AlertDialog? {
         val layoutInflaterAndroid = LayoutInflater.from(this)
