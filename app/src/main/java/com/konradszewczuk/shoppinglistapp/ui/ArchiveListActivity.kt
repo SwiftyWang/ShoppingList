@@ -31,7 +31,7 @@ class ArchiveListActivity : AppCompatActivity(), RecyclerViewClickListener {
 
     private val disposable = CompositeDisposable()
 
-    private var shoppingList = ArrayList<ShoppingListItem>()
+    private var shoppingList = ArrayList<ShoppingListDTO>()
 
     private var mAdapter: ShoppingListAdapter? = null
 
@@ -68,19 +68,19 @@ class ArchiveListActivity : AppCompatActivity(), RecyclerViewClickListener {
         // Subscribe to the emissions of the user name from the view model.
         // Update the user name text view, at every onNext emission.
         // In case of error, log the exception.
-        viewModel.getArchivedLists()
+        disposable.add(viewModel.getArchivedLists()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ t ->
                     progressBar.visibility = View.GONE
                     shoppingList.clear()
                     t?.forEach {
-                        val item = ShoppingListItem(it.id, it.name, it.timestamp, it.isArchived)
+                        val item = ShoppingListDTO(it.id, it.name, it.timestamp, it.isArchived)
                         shoppingList.add(item)
                     }
 
-                    mAdapter?.notifyDataSetChanged()
-                })
+//                    mAdapter?.notifyDataSetChanged()
+                }))
     }
 
 

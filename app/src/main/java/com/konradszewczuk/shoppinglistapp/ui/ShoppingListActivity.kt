@@ -51,7 +51,7 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
 
     private val disposable = CompositeDisposable()
 
-    private var shoppingList = ArrayList<ShoppingListItem>()
+    private var shoppingList = ArrayList<ShoppingListDTO>()
 
     private var mAdapter: ShoppingListAdapter? = null
 
@@ -62,9 +62,6 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
 
         viewModelFactory = Injection.provideViewModelFactory(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShoppingListViewModel::class.java)
-
-
-
 
         mAdapter = ShoppingListAdapter(shoppingList, this, this)
 
@@ -133,19 +130,19 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
 
     override fun onStart() {
         super.onStart()
-        viewModel.getShoppingLists()
+        disposable.add(viewModel.getShoppingLists()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ t ->
                     shoppingList.clear()
                     t?.forEach {
-                        val item = ShoppingListItem(it.id, it.name, it.timestamp, it.isArchived)
+                        val item = ShoppingListDTO(it.id, it.name, it.timestamp, it.isArchived)
                         shoppingList.add(item)
                     }
 
                     mAdapter?.notifyDataSetChanged()
                     Log.i(ShoppingListActivity.TAG, "Unable to get username")
-                })
+                }))
 
     }
 

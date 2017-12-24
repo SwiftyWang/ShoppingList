@@ -47,12 +47,12 @@ class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel
         return dataSource.getShoppingList(id)
     }
 
-    fun archiveItem(deletedShoppingListItem: com.konradszewczuk.shoppinglistapp.ui.ShoppingListItem) {
+    fun archiveItem(deletedShoppingListItem: com.konradszewczuk.shoppinglistapp.ui.ShoppingListDTO) {
 
        dataSource.archiveShoppingList(deletedShoppingListItem.id)
     }
 
-    fun reArchiveItem(deletedShoppingListItem: com.konradszewczuk.shoppinglistapp.ui.ShoppingListItem){
+    fun reArchiveItem(deletedShoppingListItem: com.konradszewczuk.shoppinglistapp.ui.ShoppingListDTO){
 
         dataSource.reArchiveShoppingList(deletedShoppingListItem.id)
     }
@@ -89,6 +89,26 @@ class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel
                             isArchived = shoppingList.isArchived,
                             timestamp = shoppingList.timestamp,
                             items = items
+                    ))
+                }
+    }
+
+    fun updateShoppingList(shoppingList: ArrayList<ShoppingListElementItem>, shoppingListId: Int) {
+        dataSource.getShoppingList(shoppingListId)
+                .firstElement()
+                .subscribe {
+                    t: ShoppingList ->
+
+                    val dbShoppingList = ArrayList<ShoppingListItem>()
+                    shoppingList.forEach {
+                        it -> dbShoppingList.add(ShoppingListItem(it.name, it.isCompleted, it.timestamp))
+                    }
+
+                    dataSource.updateShoppingList(shoppingList = ShoppingList(id = t.id,
+                            name = t.name,
+                            isArchived = t.isArchived,
+                            timestamp = t.timestamp,
+                            items = dbShoppingList
                     ))
                 }
     }

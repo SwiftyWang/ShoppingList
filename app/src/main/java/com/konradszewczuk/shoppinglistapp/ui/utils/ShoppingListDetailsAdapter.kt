@@ -13,7 +13,7 @@ import com.konradszewczuk.shoppinglistapp.ui.ShoppingListElementItem
 /**
  * Created by Admin on 2017-12-23.
  */
-class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementItem>, val context: Context, val listener: RecyclerViewClickListener, val isArchived: Boolean) : RecyclerView.Adapter<ShoppingListDetailsAdapter.ViewHolder>() {
+class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementItem>, val context: Context, val listener: ShoppingItemCheckboxListener, val isArchived: Boolean) : RecyclerView.Adapter<ShoppingListDetailsAdapter.ViewHolder>() {
 
     override fun getItemCount(): Int {
         return list.count()
@@ -22,7 +22,7 @@ class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementItem>, v
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent?.getContext())
                 .inflate(R.layout.item_shopping_list_element, parent, false)
-        return ViewHolder(itemView, listener)
+        return ViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
@@ -31,9 +31,7 @@ class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementItem>, v
         if(item.isCompleted){
             holder?.isCompleted?.isChecked = true
         }
-        else{
-            holder?.isCompleted?.isChecked = false
-        }
+
 
         if(isArchived)
         holder?.isCompleted?.isEnabled = false
@@ -43,29 +41,26 @@ class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementItem>, v
 
         holder?.isCompleted?.setOnCheckedChangeListener{
             buttonView, isChecked ->
+            item.isCompleted = isChecked
+            listener.onClick(position, isChecked)
         }
+
+
     }
 
 
-    inner class ViewHolder(view: View, clickListener: RecyclerViewClickListener) : RecyclerView.ViewHolder(view), View.OnClickListener {
-
-
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var name: TextView
         var isCompleted: CheckBox
-        private var viewClickListener: RecyclerViewClickListener? = null
+        private var viewClickListener: ShoppingItemCheckboxListener? = null
 
 
         init {
             name = view.findViewById(R.id.itemName)
             isCompleted = view.findViewById(R.id.checkbox)
-            viewClickListener = clickListener
-            view.setOnClickListener(this)
         }
 
-        override fun onClick(v: View) {
-            viewClickListener?.onClick(v, adapterPosition)
 
-        }
     }
 
     fun removeItem(position: Int) {

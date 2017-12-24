@@ -9,10 +9,10 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.konradszewczuk.shoppinglistapp.R
-import com.konradszewczuk.shoppinglistapp.ui.ShoppingListItem
+import com.konradszewczuk.shoppinglistapp.ui.ShoppingListDTO
 
 
-class ShoppingListAdapter(val list: ArrayList<ShoppingListItem>, val context: Context, val listener: RecyclerViewClickListener) : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>() {
+class ShoppingListAdapter(val list: ArrayList<ShoppingListDTO>, val context: Context, val listener: RecyclerViewClickListener) : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>() {
 
     override fun getItemCount(): Int {
         return list.count()
@@ -67,7 +67,7 @@ class ShoppingListAdapter(val list: ArrayList<ShoppingListItem>, val context: Co
         notifyItemRemoved(position)
     }
 
-    fun restoreItem(shoppingListItem: ShoppingListItem, position: Int) {
+    fun restoreItem(shoppingListItem: ShoppingListDTO, position: Int) {
         list.add(position, shoppingListItem)
         // notify shoppingListItem added by position
         notifyItemInserted(position)

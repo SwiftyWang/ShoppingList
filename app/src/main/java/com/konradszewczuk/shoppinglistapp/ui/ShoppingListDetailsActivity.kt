@@ -17,10 +17,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
+import android.widget.Toast
 import com.konradszewczuk.shoppinglistapp.Injection
 import com.konradszewczuk.shoppinglistapp.R
 import com.konradszewczuk.shoppinglistapp.ui.utils.RecyclerItemTouchHelper
-import com.konradszewczuk.shoppinglistapp.ui.utils.RecyclerViewClickListener
+import com.konradszewczuk.shoppinglistapp.ui.utils.ShoppingItemCheckboxListener
 import com.konradszewczuk.shoppinglistapp.ui.utils.ShoppingListDetailsAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -30,14 +31,7 @@ import kotlinx.android.synthetic.main.activity_shopping_list_item.*
 import kotlinx.android.synthetic.main.content_shopping_list_item.*
 import java.util.*
 
-class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, RecyclerViewClickListener {
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int, position: Int) {
-        Log.v("GOWNO", "GOWNO")
-    }
-
-    override fun onClick(view: View, position: Int) {
-
-    }
+class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, ShoppingItemCheckboxListener {
 
     private lateinit var viewModelFactory: ViewModelFactory
     private lateinit var viewModel: ShoppingListViewModel
@@ -71,11 +65,11 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
         if (isArchived as Boolean) {
             fab.visibility = View.GONE
         }
-
-        fab.setOnClickListener { view ->
-            val alertDialogAndroid = getShoppingListDialog()
-            alertDialogAndroid?.show()
-
+        else{
+            fab.setOnClickListener { view ->
+                val alertDialogAndroid = getShoppingListDialog()
+                alertDialogAndroid?.show()
+            }
         }
 
         val itemTouchHelperCallback1 = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -122,38 +116,6 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
             ItemTouchHelper(itemTouchHelperCallback1).attachToRecyclerView(recyclerView)
     }
 
-
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return true
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (intExtra != null)
-            viewModel.getShoppingList(intExtra!!)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ t ->
-                        shoppingList.clear()
-                        t.items.forEach {
-                            val item = ShoppingListElementItem(0, it.name, false, it.timestamp)
-                            shoppingList.add(item)
-                        }
-
-                        mAdapter?.notifyDataSetChanged()
-                    })
-
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        // clear all the subscription
-        disposable.clear()
-    }
-
-
     fun getShoppingListDialog(): AlertDialog? {
         val layoutInflaterAndroid = LayoutInflater.from(this)
         val mView = layoutInflaterAndroid.inflate(R.layout.dialog_input_name, null)
@@ -171,6 +133,45 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
                         DialogInterface.OnClickListener { dialogBox, id -> dialogBox.cancel() })
 
         return alertDialogBuilderUserInput.create()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (intExtra != null)
+            disposable.add(viewModel.getShoppingList(intExtra!!)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ t ->
+                        shoppingList.clear()
+                        t.items.forEach {
+                            val item = ShoppingListElementItem(it.name, it.isCompleted, it.timestamp)
+                            shoppingList.add(item)
+                        }
+
+
+                        mAdapter?.notifyDataSetChanged()
+                    }))
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        // clear all the subscription
+        disposable.clear()
+    }
+
+    override fun onClick(position: Int, isChecked: Boolean) {
+        shoppingList.get(position).isCompleted = isChecked
+        viewModel.updateShoppingList(shoppingList, intExtra!!)
+        Toast.makeText(applicationContext, "isChecked: ${isChecked}", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int, position: Int) {
     }
 
 }
