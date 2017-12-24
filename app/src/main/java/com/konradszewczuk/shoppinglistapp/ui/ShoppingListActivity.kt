@@ -24,6 +24,7 @@ import android.view.View
 import android.widget.EditText
 import com.konradszewczuk.shoppinglistapp.Injection
 import com.konradszewczuk.shoppinglistapp.R
+import com.konradszewczuk.shoppinglistapp.db.ShoppingListItem
 import com.konradszewczuk.shoppinglistapp.ui.utils.RecyclerItemTouchHelper
 import com.konradszewczuk.shoppinglistapp.ui.utils.RecyclerViewClickListener
 import com.konradszewczuk.shoppinglistapp.ui.utils.ShoppingListAdapter
@@ -136,7 +137,8 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
                 .subscribe({ t ->
                     shoppingList.clear()
                     t?.forEach {
-                        val item = ShoppingListDTO(it.id, it.name, it.timestamp, it.isArchived)
+                        val completed = it.items.filter(ShoppingListItem::isCompleted)
+                        val item = ShoppingListDTO(it.id, it.name, it.timestamp, it.isArchived, completed.size, it.items.size)
                         shoppingList.add(item)
                     }
 

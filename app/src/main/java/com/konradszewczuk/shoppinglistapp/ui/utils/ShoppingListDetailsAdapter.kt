@@ -9,6 +9,8 @@ import android.widget.CheckBox
 import android.widget.TextView
 import com.konradszewczuk.shoppinglistapp.R
 import com.konradszewczuk.shoppinglistapp.ui.ShoppingListElementItem
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by Admin on 2017-12-23.
@@ -59,7 +61,6 @@ class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementItem>, v
             name = view.findViewById(R.id.itemName)
             isCompleted = view.findViewById(R.id.checkbox)
         }
-
 
     }
 

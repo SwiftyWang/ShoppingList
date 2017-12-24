@@ -17,7 +17,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
-import android.widget.Toast
 import com.konradszewczuk.shoppinglistapp.Injection
 import com.konradszewczuk.shoppinglistapp.R
 import com.konradszewczuk.shoppinglistapp.ui.utils.RecyclerItemTouchHelper
@@ -168,7 +167,6 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
     override fun onClick(position: Int, isChecked: Boolean) {
         shoppingList.get(position).isCompleted = isChecked
         viewModel.updateShoppingList(shoppingList, intExtra!!)
-        Toast.makeText(applicationContext, "isChecked: ${isChecked}", Toast.LENGTH_SHORT).show()
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int, position: Int) {
