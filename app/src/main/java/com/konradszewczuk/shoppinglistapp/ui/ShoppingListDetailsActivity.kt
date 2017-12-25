@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.design.widget.TextInputLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
@@ -16,7 +17,9 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
+import com.jakewharton.rxbinding2.widget.RxTextView
 import com.konradszewczuk.shoppinglistapp.Injection
 import com.konradszewczuk.shoppinglistapp.R
 import com.konradszewczuk.shoppinglistapp.ui.dto.ShoppingListElementDTO
@@ -40,6 +43,8 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
     private val disposable = CompositeDisposable()
     private var shoppingList = ArrayList<ShoppingListElementDTO>()
     private var mAdapter: ShoppingListDetailsAdapter? = null
+    private var dialogCreateNamePositiveButton: Button? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +74,9 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
             fab.setOnClickListener { view ->
                 val alertDialogAndroid = getShoppingListDialog()
                 alertDialogAndroid?.show()
+
+                dialogCreateNamePositiveButton = alertDialogAndroid?.getButton(DialogInterface.BUTTON_POSITIVE)
+                dialogCreateNamePositiveButton?.isEnabled = false
             }
         }
 
@@ -122,7 +130,21 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
         val alertDialogBuilderUserInput = AlertDialog.Builder(this)
         alertDialogBuilderUserInput.setView(mView)
 
-        val userInputDialogEditText = mView.findViewById(R.id.userInputDialog) as EditText
+        val nameInputDialogTextInputLayout =  mView.findViewById(R.id.nameInputDialogTextInputLayout) as TextInputLayout
+        val userInputDialogEditText = mView.findViewById(R.id.nameInputDialog) as EditText
+        val itemInputNameObservable = RxTextView.textChanges(userInputDialogEditText)
+                .map { inputText: CharSequence -> inputText.isEmpty() }
+                .distinctUntilChanged()
+
+        itemInputNameObservable.subscribe { inputIsEmpty: Boolean ->
+            Log.v("itemInputNameObservable", inputIsEmpty.toString())
+
+            nameInputDialogTextInputLayout.setError("Name must not be empty")
+            nameInputDialogTextInputLayout.setErrorEnabled(inputIsEmpty)
+
+            dialogCreateNamePositiveButton?.isEnabled = !inputIsEmpty
+        }
+
         alertDialogBuilderUserInput
                 .setCancelable(false)
                 .setPositiveButton("Create", DialogInterface.OnClickListener { dialogBox, id ->

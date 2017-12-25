@@ -10,13 +10,21 @@
         android:id="@+id/dialogTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Name"
+        android:text="Create item"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <EditText
-        android:id="@+id/userInputDialog"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/nameInputDialogTextInputLayout"
+        android:layout_marginTop="8dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter name"
-        android:inputType="text" />
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/nameInputDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter name"
+            android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
+
 </LinearLayout>
