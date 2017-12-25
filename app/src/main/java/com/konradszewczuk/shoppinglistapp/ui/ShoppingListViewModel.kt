@@ -4,25 +4,26 @@ import android.arch.lifecycle.ViewModel
 import com.konradszewczuk.shoppinglistapp.db.ShoppingList
 import com.konradszewczuk.shoppinglistapp.db.ShoppingListDao
 import com.konradszewczuk.shoppinglistapp.db.ShoppingListItem
+import com.konradszewczuk.shoppinglistapp.ui.dto.ShoppingListDTO
+import com.konradszewczuk.shoppinglistapp.ui.dto.ShoppingListElementDTO
 import io.reactivex.Flowable
 import java.util.*
 import kotlin.collections.ArrayList
 
 class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel() {
 
-    fun createShoppingList(listName: String){
+    fun createShoppingList(listName: String) {
         val arrayList = ArrayList<ShoppingListItem>()
         val shoppingList = ShoppingList(name = listName, isArchived = false, items = arrayList, timestamp = Date())
         dataSource.insertShoppingList(shoppingList)
     }
 
-    fun createShoppingListItem(itemName: String, shoppingListId: Int){
+    fun createShoppingListItem(itemName: String, shoppingListId: Int) {
         dataSource.getShoppingList(shoppingListId)
                 .firstElement()
-                .subscribe {
-                    shoppingList: ShoppingList ->
+                .subscribe { shoppingList: ShoppingList ->
                     val items = shoppingList.items
-                     items.add(ShoppingListItem(itemName, false, Date()))
+                    items.add(ShoppingListItem(itemName, false, Date()))
 
                     dataSource.updateShoppingList(shoppingList = shoppingList)
                 }
@@ -30,15 +31,15 @@ class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel
 
     fun getShoppingLists(): Flowable<List<ShoppingList>> {
         return dataSource.getActiveShoppingLists()
-                .map {
-                    t -> t.sortedByDescending { it.timestamp }
+                .map { t ->
+                    t.sortedByDescending { it.timestamp }
                 }
     }
 
     fun getArchivedLists(): Flowable<List<ShoppingList>> {
         return dataSource.getArchivedShoppingLists()
-                .map {
-                    t -> t.sortedByDescending { it.timestamp }
+                .map { t ->
+                    t.sortedByDescending { it.timestamp }
                 }
 
     }
@@ -47,21 +48,20 @@ class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel
         return dataSource.getShoppingList(id)
     }
 
-    fun archiveItem(deletedShoppingListItem: com.konradszewczuk.shoppinglistapp.ui.ShoppingListDTO) {
+    fun archiveItem(deletedShoppingListItem: ShoppingListDTO) {
 
-       dataSource.archiveShoppingList(deletedShoppingListItem.id)
+        dataSource.archiveShoppingList(deletedShoppingListItem.id)
     }
 
-    fun reArchiveItem(deletedShoppingListItem: com.konradszewczuk.shoppinglistapp.ui.ShoppingListDTO){
+    fun reArchiveItem(deletedShoppingListItem: ShoppingListDTO) {
 
         dataSource.reArchiveShoppingList(deletedShoppingListItem.id)
     }
 
-    fun removeShoppingListItem(deletedItem: ShoppingListElementItem, shoppingListId: Int) {
+    fun removeShoppingListItem(deletedItem: ShoppingListElementDTO, shoppingListId: Int) {
         dataSource.getShoppingList(shoppingListId)
                 .firstElement()
-                .subscribe {
-                    shoppingList: ShoppingList ->
+                .subscribe { shoppingList: ShoppingList ->
                     val items: ArrayList<ShoppingListItem> = shoppingList.items
 
                     val filter = items.filter {
@@ -73,15 +73,14 @@ class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel
                             isArchived = shoppingList.isArchived,
                             timestamp = shoppingList.timestamp,
                             items = filter as ArrayList<ShoppingListItem>
-                            ))
+                    ))
                 }
     }
 
-    fun restoreShoppingListItem(deletedItem: ShoppingListElementItem, shoppingListId: Int) {
+    fun restoreShoppingListItem(deletedItem: ShoppingListElementDTO, shoppingListId: Int) {
         dataSource.getShoppingList(shoppingListId)
                 .firstElement()
-                .subscribe {
-                    shoppingList: ShoppingList ->
+                .subscribe { shoppingList: ShoppingList ->
                     val items = shoppingList.items
                     items.add(ShoppingListItem(deletedItem.name, deletedItem.isCompleted, deletedItem.timestamp))
                     dataSource.updateShoppingList(shoppingList = ShoppingList(id = shoppingList.id,
@@ -93,15 +92,14 @@ class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel
                 }
     }
 
-    fun updateShoppingList(shoppingList: ArrayList<ShoppingListElementItem>, shoppingListId: Int) {
+    fun updateShoppingList(shoppingList: ArrayList<ShoppingListElementDTO>, shoppingListId: Int) {
         dataSource.getShoppingList(shoppingListId)
                 .firstElement()
-                .subscribe {
-                    t: ShoppingList ->
+                .subscribe { t: ShoppingList ->
 
                     val dbShoppingList = ArrayList<ShoppingListItem>()
-                    shoppingList.forEach {
-                        it -> dbShoppingList.add(ShoppingListItem(it.name, it.isCompleted, it.timestamp))
+                    shoppingList.forEach { it ->
+                        dbShoppingList.add(ShoppingListItem(it.name, it.isCompleted, it.timestamp))
                     }
 
                     dataSource.updateShoppingList(shoppingList = ShoppingList(id = t.id,

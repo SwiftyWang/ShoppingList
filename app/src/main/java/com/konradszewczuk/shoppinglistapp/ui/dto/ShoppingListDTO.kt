@@ -1,4 +1,4 @@
-package com.konradszewczuk.shoppinglistapp.ui
+package com.konradszewczuk.shoppinglistapp.ui.dto
 
 import java.util.*
 

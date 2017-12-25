@@ -11,40 +11,31 @@ import android.view.View
 import com.konradszewczuk.shoppinglistapp.Injection
 import com.konradszewczuk.shoppinglistapp.R
 import com.konradszewczuk.shoppinglistapp.db.ShoppingListItem
-import com.konradszewczuk.shoppinglistapp.ui.utils.RecyclerViewClickListener
-import com.konradszewczuk.shoppinglistapp.ui.utils.ShoppingListAdapter
+import com.konradszewczuk.shoppinglistapp.ui.dto.ShoppingListDTO
+import com.konradszewczuk.shoppinglistapp.ui.listeners.RecyclerViewClickListener
+import com.konradszewczuk.shoppinglistapp.ui.adapters.ShoppingListAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_archive_list.*
 
 
 class ArchiveListActivity : AppCompatActivity(), RecyclerViewClickListener {
-    override fun onClick(view: View, position: Int) {
-        val id = shoppingList.get(position).id
-        val isArchived = shoppingList.get(position).isArchived
-        goToShoppingListDetailsActivity(id, isArchived)
-    }
 
     private lateinit var viewModelFactory: ViewModelFactory
-
     private lateinit var viewModel: ShoppingListViewModel
-
     private val disposable = CompositeDisposable()
-
     private var shoppingList = ArrayList<ShoppingListDTO>()
-
     private var mAdapter: ShoppingListAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_archive_list)
 
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         viewModelFactory = Injection.provideViewModelFactory(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShoppingListViewModel::class.java)
-
 
         shoppingList = ArrayList()
         mAdapter = ShoppingListAdapter(shoppingList, this, this)
@@ -66,9 +57,6 @@ class ArchiveListActivity : AppCompatActivity(), RecyclerViewClickListener {
 
     override fun onStart() {
         super.onStart()
-        // Subscribe to the emissions of the user name from the view model.
-        // Update the user name text view, at every onNext emission.
-        // In case of error, log the exception.
         disposable.add(viewModel.getArchivedLists()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -81,10 +69,14 @@ class ArchiveListActivity : AppCompatActivity(), RecyclerViewClickListener {
                         shoppingList.add(item)
                     }
 
-//                    mAdapter?.notifyDataSetChanged()
                 }))
     }
 
+    override fun onClick(view: View, position: Int) {
+        val id = shoppingList.get(position).id
+        val isArchived = shoppingList.get(position).isArchived
+        goToShoppingListDetailsActivity(id, isArchived)
+    }
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
@@ -93,13 +85,7 @@ class ArchiveListActivity : AppCompatActivity(), RecyclerViewClickListener {
 
     override fun onStop() {
         super.onStop()
-
-        // clear all the subscription
         disposable.clear()
-    }
-
-    companion object {
-        private val TAG = ArchiveListActivity::class.java.simpleName
     }
 
 }

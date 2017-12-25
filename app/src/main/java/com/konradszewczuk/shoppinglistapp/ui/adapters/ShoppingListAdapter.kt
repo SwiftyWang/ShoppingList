@@ -1,4 +1,4 @@
-package com.konradszewczuk.shoppinglistapp.ui.utils
+package com.konradszewczuk.shoppinglistapp.ui.adapters
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -7,7 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.konradszewczuk.shoppinglistapp.R
-import com.konradszewczuk.shoppinglistapp.ui.ShoppingListDTO
+import com.konradszewczuk.shoppinglistapp.ui.dto.ShoppingListDTO
+import com.konradszewczuk.shoppinglistapp.ui.listeners.RecyclerViewClickListener
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,7 +35,6 @@ class ShoppingListAdapter(val list: ArrayList<ShoppingListDTO>, val context: Con
 
 
     inner class ViewHolder(view: View, clickListener: RecyclerViewClickListener) : RecyclerView.ViewHolder(view), View.OnClickListener {
-
 
         var name: TextView
         var timestamp: TextView

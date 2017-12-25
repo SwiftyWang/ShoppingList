@@ -1,4 +1,4 @@
-package com.konradszewczuk.shoppinglistapp.ui.utils
+package com.konradszewczuk.shoppinglistapp.ui.adapters
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -8,14 +8,12 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import com.konradszewczuk.shoppinglistapp.R
-import com.konradszewczuk.shoppinglistapp.ui.ShoppingListElementItem
-import java.text.SimpleDateFormat
+import com.konradszewczuk.shoppinglistapp.ui.dto.ShoppingListElementDTO
+import com.konradszewczuk.shoppinglistapp.ui.listeners.ShoppingItemCheckboxListener
 import java.util.*
 
-/**
- * Created by Admin on 2017-12-23.
- */
-class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementItem>, val context: Context, val listener: ShoppingItemCheckboxListener, val isArchived: Boolean) : RecyclerView.Adapter<ShoppingListDetailsAdapter.ViewHolder>() {
+
+class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementDTO>, val context: Context, val listener: ShoppingItemCheckboxListener, val isArchived: Boolean) : RecyclerView.Adapter<ShoppingListDetailsAdapter.ViewHolder>() {
 
     override fun getItemCount(): Int {
         return list.count()
@@ -30,26 +28,23 @@ class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementItem>, v
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val item = list.get(position)
         holder?.name?.setText(item.name)
-        if(item.isCompleted){
+        if (item.isCompleted) {
             holder?.isCompleted?.isChecked = true
         }
 
 
-        if(isArchived)
-        holder?.isCompleted?.isEnabled = false
-        else{
+        if (isArchived)
+            holder?.isCompleted?.isEnabled = false
+        else {
             holder?.isCompleted?.isEnabled = true
         }
 
-        holder?.isCompleted?.setOnCheckedChangeListener{
-            buttonView, isChecked ->
+        holder?.isCompleted?.setOnCheckedChangeListener { buttonView, isChecked ->
             item.isCompleted = isChecked
             listener.onClick(position, isChecked)
         }
 
-
     }
-
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var name: TextView
@@ -72,7 +67,7 @@ class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementItem>, v
         notifyItemRemoved(position)
     }
 
-    fun restoreItem(item: ShoppingListElementItem, position: Int) {
+    fun restoreItem(item: ShoppingListElementDTO, position: Int) {
         list.add(position, item)
         // notify item added by position
         notifyItemInserted(position)

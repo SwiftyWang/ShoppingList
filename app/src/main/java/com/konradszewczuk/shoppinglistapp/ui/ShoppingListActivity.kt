@@ -2,10 +2,8 @@ package com.konradszewczuk.shoppinglistapp.ui
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-
-import kotlinx.android.synthetic.main.activity_main2.*
+import kotlinx.android.synthetic.main.activity_shopping_list.*
 import android.arch.lifecycle.ViewModelProviders
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
@@ -25,40 +23,28 @@ import android.widget.EditText
 import com.konradszewczuk.shoppinglistapp.Injection
 import com.konradszewczuk.shoppinglistapp.R
 import com.konradszewczuk.shoppinglistapp.db.ShoppingListItem
-import com.konradszewczuk.shoppinglistapp.ui.utils.RecyclerItemTouchHelper
-import com.konradszewczuk.shoppinglistapp.ui.utils.RecyclerViewClickListener
-import com.konradszewczuk.shoppinglistapp.ui.utils.ShoppingListAdapter
+import com.konradszewczuk.shoppinglistapp.ui.dto.ShoppingListDTO
+import com.konradszewczuk.shoppinglistapp.ui.listeners.RecyclerItemTouchHelper
+import com.konradszewczuk.shoppinglistapp.ui.listeners.RecyclerViewClickListener
+import com.konradszewczuk.shoppinglistapp.ui.adapters.ShoppingListAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.content_main2.*
+import kotlinx.android.synthetic.main.content_shopping_list.*
 import java.util.*
 
 
-class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, RecyclerViewClickListener{
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int, position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun onClick(view: View, position: Int) {
-        val id = shoppingList.get(position).id
-        val isArchived = shoppingList.get(position).isArchived
-        goToShoppingListDetailsActivity(id, isArchived)
-    }
+class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, RecyclerViewClickListener {
 
     private lateinit var viewModelFactory: ViewModelFactory
-
     private lateinit var viewModel: ShoppingListViewModel
-
     private val disposable = CompositeDisposable()
-
     private var shoppingList = ArrayList<ShoppingListDTO>()
-
     private var mAdapter: ShoppingListAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main2)
+        setContentView(R.layout.activity_shopping_list)
         setSupportActionBar(toolbar)
 
         viewModelFactory = Injection.provideViewModelFactory(this)
@@ -75,9 +61,6 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
         fab.setOnClickListener { view ->
             val alertDialogAndroid = getShoppingListDialog()
             alertDialogAndroid?.show()
-
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show()
 
         }
 
@@ -101,7 +84,6 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
                     mAdapter?.removeItem(viewHolder.adapterPosition)
                     viewModel.archiveItem(deletedItem)
 
-
                     // showing snack bar with Undo option
                     val snackbar = Snackbar
                             .make(coordinatorLayout, name + " is archived!", Snackbar.LENGTH_LONG)
@@ -122,10 +104,8 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
             }
         }
 
-//        new ItemTouchHelper(itemTouchHelperCallback1).attachToRecyclerView(recyclerView);
         ItemTouchHelper(itemTouchHelperCallback1).attachToRecyclerView(recyclerView)
 
-//        viewModel.createArchiveList("Archived")
     }
 
 
@@ -143,15 +123,12 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
                     }
 
                     mAdapter?.notifyDataSetChanged()
-                    Log.i(ShoppingListActivity.TAG, "Unable to get username")
                 }))
 
     }
 
     override fun onStop() {
         super.onStop()
-
-        // clear all the subscription
         disposable.clear()
     }
 
@@ -168,15 +145,11 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main3, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
             R.id.action_archived_list -> goToArchiveListActivity()
             else -> return super.onOptionsItemSelected(item)
@@ -185,8 +158,14 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
         return true
     }
 
-    companion object {
-        private val TAG = ShoppingListActivity::class.java.simpleName
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int, position: Int) {
+
+    }
+
+    override fun onClick(view: View, position: Int) {
+        val id = shoppingList.get(position).id
+        val isArchived = shoppingList.get(position).isArchived
+        goToShoppingListDetailsActivity(id, isArchived)
     }
 
     fun getShoppingListDialog(): AlertDialog? {
@@ -198,12 +177,12 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
         val userInputDialogEditText = mView.findViewById(R.id.userInputDialog) as EditText
         alertDialogBuilderUserInput
                 .setCancelable(false)
-                .setPositiveButton("Send", DialogInterface.OnClickListener { dialogBox, id ->
+                .setPositiveButton("Create", { _, _ ->
                     viewModel.createShoppingList(userInputDialogEditText.text.toString())
                 })
 
                 .setNegativeButton("Cancel",
-                        DialogInterface.OnClickListener { dialogBox, id -> dialogBox.cancel() })
+                        { dialogBox, _ -> dialogBox.cancel() })
 
         return alertDialogBuilderUserInput.create()
     }

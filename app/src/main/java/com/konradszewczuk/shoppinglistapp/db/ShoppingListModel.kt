@@ -6,7 +6,6 @@ import android.arch.persistence.room.PrimaryKey
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 @Entity(tableName = "shopping_list")
 data class ShoppingList(
         @PrimaryKey(autoGenerate = true)

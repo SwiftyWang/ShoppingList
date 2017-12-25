@@ -1,4 +1,4 @@
-package com.konradszewczuk.shoppinglistapp.ui.utils
+package com.konradszewczuk.shoppinglistapp.ui.listeners
 
 import android.view.View
 

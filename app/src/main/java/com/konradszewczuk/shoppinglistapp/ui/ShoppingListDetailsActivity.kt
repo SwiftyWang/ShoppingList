@@ -19,9 +19,10 @@ import android.view.View
 import android.widget.EditText
 import com.konradszewczuk.shoppinglistapp.Injection
 import com.konradszewczuk.shoppinglistapp.R
-import com.konradszewczuk.shoppinglistapp.ui.utils.RecyclerItemTouchHelper
-import com.konradszewczuk.shoppinglistapp.ui.utils.ShoppingItemCheckboxListener
-import com.konradszewczuk.shoppinglistapp.ui.utils.ShoppingListDetailsAdapter
+import com.konradszewczuk.shoppinglistapp.ui.dto.ShoppingListElementDTO
+import com.konradszewczuk.shoppinglistapp.ui.listeners.RecyclerItemTouchHelper
+import com.konradszewczuk.shoppinglistapp.ui.listeners.ShoppingItemCheckboxListener
+import com.konradszewczuk.shoppinglistapp.ui.adapters.ShoppingListDetailsAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -37,12 +38,12 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
     private var intExtra: Int? = null
     private var isArchived: Boolean? = null
     private val disposable = CompositeDisposable()
-    private var shoppingList = ArrayList<ShoppingListElementItem>()
+    private var shoppingList = ArrayList<ShoppingListElementDTO>()
     private var mAdapter: ShoppingListDetailsAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main2)
+        setContentView(R.layout.activity_shopping_list)
         setSupportActionBar(toolbar)
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -124,7 +125,7 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
         val userInputDialogEditText = mView.findViewById(R.id.userInputDialog) as EditText
         alertDialogBuilderUserInput
                 .setCancelable(false)
-                .setPositiveButton("Send", DialogInterface.OnClickListener { dialogBox, id ->
+                .setPositiveButton("Create", DialogInterface.OnClickListener { dialogBox, id ->
                     viewModel.createShoppingListItem(userInputDialogEditText.text.toString(), intExtra!!)
                 })
 
@@ -148,7 +149,7 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
                     .subscribe({ t ->
                         shoppingList.clear()
                         t.items.forEach {
-                            val item = ShoppingListElementItem(it.name, it.isCompleted, it.timestamp)
+                            val item = ShoppingListElementDTO(it.name, it.isCompleted, it.timestamp)
                             shoppingList.add(item)
                         }
 
