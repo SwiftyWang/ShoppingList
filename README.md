@@ -14,6 +14,7 @@ App for making shopping list and managing the items inside of it.
 * [Kotlin](https://kotlinlang.org/)
 * [RxJava](https://github.com/ReactiveX/RxJava)/[RxAndroid](https://github.com/ReactiveX/RxAndroid)/[RxBinding](https://github.com/JakeWharton/RxBinding)
 * [Android Architecture Components](https://developer.android.com/topic/libraries/architecture/index.html)
+* [Gson](https://github.com/google/gson)
 
 ## Do you want to contribute?
 
