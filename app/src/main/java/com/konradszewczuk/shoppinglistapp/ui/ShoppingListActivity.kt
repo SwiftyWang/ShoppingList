@@ -132,7 +132,6 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
 
                     mAdapter?.notifyDataSetChanged()
                 }))
-
     }
 
     override fun onStop() {
@@ -201,7 +200,7 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
         alertDialogBuilderUserInput
                 .setCancelable(false)
                 .setPositiveButton("Create", { _, _ ->
-                    viewModel.createShoppingList(userInputDialogEditText.text.toString())
+                     viewModel.createShoppingList(userInputDialogEditText.text.toString())
                 })
 
                 .setNegativeButton("Cancel",

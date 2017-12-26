@@ -6,7 +6,10 @@ import com.konradszewczuk.shoppinglistapp.db.ShoppingListDao
 import com.konradszewczuk.shoppinglistapp.db.ShoppingListItem
 import com.konradszewczuk.shoppinglistapp.ui.dto.ShoppingListDTO
 import com.konradszewczuk.shoppinglistapp.ui.dto.ShoppingListElementDTO
+import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -15,7 +18,7 @@ class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel
     fun createShoppingList(listName: String) {
         val arrayList = ArrayList<ShoppingListItem>()
         val shoppingList = ShoppingList(name = listName, isArchived = false, items = arrayList, timestamp = Date())
-        dataSource.insertShoppingList(shoppingList)
+        Completable.fromCallable{dataSource.insertShoppingList(shoppingList)}.subscribeOn(Schedulers.io()).subscribe()
     }
 
     fun createShoppingListItem(itemName: String, shoppingListId: Int) {
@@ -49,11 +52,11 @@ class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel
     }
 
     fun archiveItem(deletedShoppingListItem: ShoppingListDTO) {
-        dataSource.archiveShoppingList(deletedShoppingListItem.id)
+        Completable.fromCallable {dataSource.archiveShoppingList(deletedShoppingListItem.id)}.subscribeOn(Schedulers.io()).subscribe()
     }
 
     fun reArchiveItem(deletedShoppingListItem: ShoppingListDTO) {
-        dataSource.reArchiveShoppingList(deletedShoppingListItem.id)
+        Completable.fromCallable {dataSource.reArchiveShoppingList(deletedShoppingListItem.id)}.subscribeOn(Schedulers.io()).subscribe()
     }
 
     fun removeShoppingListItem(deletedItem: ShoppingListElementDTO, shoppingListId: Int) {
