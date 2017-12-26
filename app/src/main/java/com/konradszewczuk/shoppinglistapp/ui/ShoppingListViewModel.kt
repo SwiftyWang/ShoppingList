@@ -49,12 +49,10 @@ class ShoppingListViewModel(private val dataSource: ShoppingListDao) : ViewModel
     }
 
     fun archiveItem(deletedShoppingListItem: ShoppingListDTO) {
-
         dataSource.archiveShoppingList(deletedShoppingListItem.id)
     }
 
     fun reArchiveItem(deletedShoppingListItem: ShoppingListDTO) {
-
         dataSource.reArchiveShoppingList(deletedShoppingListItem.id)
     }
 

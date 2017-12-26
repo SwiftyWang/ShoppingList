@@ -16,7 +16,7 @@ interface ShoppingListDao {
     fun getArchivedShoppingLists(): Flowable<List<ShoppingList>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertShoppingList(shoppingList: ShoppingList)
+    fun insertShoppingList(shoppingList: ShoppingList): Long
 
     @Update
     fun updateShoppingList(shoppingList: ShoppingList)
