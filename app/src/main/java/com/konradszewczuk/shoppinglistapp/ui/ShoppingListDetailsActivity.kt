@@ -62,15 +62,14 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
         mAdapter = ShoppingListDetailsAdapter(shoppingList, this, this, isArchived!!)
 
         val mLayoutManager = LinearLayoutManager(applicationContext)
-        recyclerView.setLayoutManager(mLayoutManager)
-        recyclerView.setItemAnimator(DefaultItemAnimator())
+        recyclerView.layoutManager = mLayoutManager
+        recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        recyclerView.setAdapter(mAdapter)
+        recyclerView.adapter = mAdapter
 
         if (isArchived as Boolean) {
             fab.visibility = View.GONE
-        }
-        else{
+        } else {
             fab.setOnClickListener { view ->
                 val alertDialogAndroid = getShoppingListDialog()
                 alertDialogAndroid?.show()
@@ -103,8 +102,8 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
 
                     // showing snack bar with Undo option
                     val snackbar = Snackbar
-                            .make(coordinatorLayout, name + " is deleted!", Snackbar.LENGTH_LONG)
-                    snackbar.setAction("UNDO", View.OnClickListener {
+                            .make(coordinatorLayout, "$name is deleted!", Snackbar.LENGTH_LONG)
+                    snackbar.setAction("UNDO", {
                         // undo is selected, restore the deleted item
                         mAdapter?.restoreItem(deletedItem, deletedIndex)
                         viewModel.restoreShoppingListItem(deletedItem, intExtra!!)
@@ -130,7 +129,7 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
         val alertDialogBuilderUserInput = AlertDialog.Builder(this)
         alertDialogBuilderUserInput.setView(mView)
 
-        val nameInputDialogTextInputLayout =  mView.findViewById(R.id.nameInputDialogTextInputLayout) as TextInputLayout
+        val nameInputDialogTextInputLayout = mView.findViewById(R.id.nameInputDialogTextInputLayout) as TextInputLayout
         val userInputDialogEditText = mView.findViewById(R.id.nameInputDialog) as EditText
         val itemInputNameObservable = RxTextView.textChanges(userInputDialogEditText)
                 .map { inputText: CharSequence -> inputText.isEmpty() }
@@ -139,20 +138,19 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
         itemInputNameObservable.subscribe { inputIsEmpty: Boolean ->
             Log.v("itemInputNameObservable", inputIsEmpty.toString())
 
-            nameInputDialogTextInputLayout.setError("Name must not be empty")
-            nameInputDialogTextInputLayout.setErrorEnabled(inputIsEmpty)
+            nameInputDialogTextInputLayout.error = "Name must not be empty"
+            nameInputDialogTextInputLayout.isErrorEnabled = inputIsEmpty
 
             dialogCreateNamePositiveButton?.isEnabled = !inputIsEmpty
         }
 
         alertDialogBuilderUserInput
                 .setCancelable(false)
-                .setPositiveButton("Create", DialogInterface.OnClickListener { dialogBox, id ->
+                .setPositiveButton("Create", { dialogBox, id ->
                     viewModel.createShoppingListItem(userInputDialogEditText.text.toString(), intExtra!!)
                 })
 
-                .setNegativeButton("Cancel",
-                        DialogInterface.OnClickListener { dialogBox, id -> dialogBox.cancel() })
+                .setNegativeButton("Cancel", { dialogBox, id -> dialogBox.cancel() })
 
         return alertDialogBuilderUserInput.create()
     }
@@ -188,7 +186,7 @@ class ShoppingListDetailsActivity : AppCompatActivity(), RecyclerItemTouchHelper
     }
 
     override fun onClick(position: Int, isChecked: Boolean) {
-        shoppingList.get(position).isCompleted = isChecked
+        shoppingList[position].isCompleted = isChecked
         viewModel.updateShoppingList(shoppingList, intExtra!!)
     }
 

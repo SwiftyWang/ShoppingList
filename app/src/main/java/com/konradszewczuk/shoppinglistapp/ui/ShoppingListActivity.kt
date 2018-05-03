@@ -58,12 +58,12 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
         mAdapter = ShoppingListAdapter(shoppingList, this, this)
 
         val mLayoutManager = LinearLayoutManager(applicationContext)
-        recyclerView.setLayoutManager(mLayoutManager)
-        recyclerView.setItemAnimator(DefaultItemAnimator())
+        recyclerView.layoutManager = mLayoutManager
+        recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        recyclerView.setAdapter(mAdapter)
+        recyclerView.adapter = mAdapter
 
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener {
             val alertDialogAndroid = getShoppingListDialog()
             alertDialogAndroid?.show()
 
@@ -94,8 +94,8 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
 
                     // showing snack bar with Undo option
                     val snackbar = Snackbar
-                            .make(coordinatorLayout, name + " is archived!", Snackbar.LENGTH_LONG)
-                    snackbar.setAction("UNDO", View.OnClickListener {
+                            .make(coordinatorLayout, "$name is archived!", Snackbar.LENGTH_LONG)
+                    snackbar.setAction("UNDO", {
                         // undo is selected, restore the deleted item
                         mAdapter?.restoreItem(deletedItem, deletedIndex)
                         viewModel.reArchiveItem(deletedItem)
@@ -104,7 +104,7 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
                     snackbar.setActionTextColor(Color.YELLOW)
                     snackbar.show()
                 }
-                Log.v("Test" ,"test")
+                Log.v("Test", "test")
             }
 
             override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
@@ -139,7 +139,7 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
         disposable.clear()
     }
 
-    fun goToArchiveListActivity(){
+    fun goToArchiveListActivity() {
         val intent = Intent(this, ArchiveListActivity::class.java)
         startActivity(intent)
     }
@@ -182,17 +182,17 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
         alertDialogBuilderUserInput.setView(mView)
 
 
-        val nameInputDialogTextInputLayout =  mView.findViewById(R.id.nameInputDialogTextInputLayout) as TextInputLayout
+        val nameInputDialogTextInputLayout = mView.findViewById(R.id.nameInputDialogTextInputLayout) as TextInputLayout
         val userInputDialogEditText = mView.findViewById(R.id.nameInputDialog) as EditText
         val itemInputNameObservable = RxTextView.textChanges(userInputDialogEditText)
                 .map { inputText: CharSequence -> inputText.isEmpty() }
                 .distinctUntilChanged()
 
-        itemInputNameObservable.subscribe{inputIsEmpty: Boolean ->
+        itemInputNameObservable.subscribe { inputIsEmpty: Boolean ->
             Log.v("itemInputNameObservable", inputIsEmpty.toString())
 
-            nameInputDialogTextInputLayout.setError("Name must not be empty")
-            nameInputDialogTextInputLayout.setErrorEnabled(inputIsEmpty)
+            nameInputDialogTextInputLayout.error = "Name must not be empty"
+            nameInputDialogTextInputLayout.isErrorEnabled = inputIsEmpty
 
             dialogCreateNamePositiveButton?.isEnabled = !inputIsEmpty
         }
@@ -200,7 +200,7 @@ class ShoppingListActivity : AppCompatActivity(), RecyclerItemTouchHelper.Recycl
         alertDialogBuilderUserInput
                 .setCancelable(false)
                 .setPositiveButton("Create", { _, _ ->
-                     viewModel.createShoppingList(userInputDialogEditText.text.toString())
+                    viewModel.createShoppingList(userInputDialogEditText.text.toString())
                 })
 
                 .setNegativeButton("Cancel",

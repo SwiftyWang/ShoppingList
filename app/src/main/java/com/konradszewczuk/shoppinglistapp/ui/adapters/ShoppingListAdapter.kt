@@ -20,11 +20,11 @@ class ShoppingListAdapter(val list: ArrayList<ShoppingListDTO>, val context: Con
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        val item = list.get(position)
-        holder?.name?.setText(item.name)
-        holder?.timestamp?.setText(convertDateTime(item.timeStamp))
-        holder?.completedShoppingListItems?.setText(item.itemsCompletedCount.toString())
-        holder?.allShoppingListItems?.setText(item.itemsAllCount.toString())
+        val item = list[position]
+        holder?.name?.text = item.name
+        holder?.timestamp?.text = convertDateTime(item.timeStamp)
+        holder?.completedShoppingListItems?.text = item.itemsCompletedCount.toString()
+        holder?.allShoppingListItems?.text = item.itemsAllCount.toString()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -36,18 +36,14 @@ class ShoppingListAdapter(val list: ArrayList<ShoppingListDTO>, val context: Con
 
     inner class ViewHolder(view: View, clickListener: RecyclerViewClickListener) : RecyclerView.ViewHolder(view), View.OnClickListener {
 
-        var name: TextView
-        var timestamp: TextView
-        var completedShoppingListItems: TextView
-        var allShoppingListItems: TextView
+        var name: TextView = view.findViewById(R.id.name)
+        var timestamp: TextView = view.findViewById(R.id.timestamp)
+        var completedShoppingListItems: TextView = view.findViewById(R.id.completedShoppingListItems)
+        var allShoppingListItems: TextView = view.findViewById(R.id.allShoppingListItems)
         private var viewClickListener: RecyclerViewClickListener? = null
 
 
         init {
-            name = view.findViewById(R.id.name)
-            timestamp = view.findViewById(R.id.timestamp)
-            completedShoppingListItems = view.findViewById(R.id.completedShoppingListItems)
-            allShoppingListItems = view.findViewById(R.id.allShoppingListItems)
             viewClickListener = clickListener
             view.setOnClickListener(this)
         }
@@ -72,7 +68,7 @@ class ShoppingListAdapter(val list: ArrayList<ShoppingListDTO>, val context: Con
     }
 
     private fun convertDateTime(date: Date): String? {
-        val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+        val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
         return dateFormat.format(date)
     }
 }

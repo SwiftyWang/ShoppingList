@@ -8,7 +8,6 @@ import com.konradszewczuk.shoppinglistapp.ui.dto.ShoppingListDTO
 import com.konradszewczuk.shoppinglistapp.ui.dto.ShoppingListElementDTO
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 import kotlin.collections.ArrayList

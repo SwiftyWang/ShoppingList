@@ -41,10 +41,10 @@ class ArchiveListActivity : AppCompatActivity(), RecyclerViewClickListener {
         mAdapter = ShoppingListAdapter(shoppingList, this, this)
 
         val mLayoutManager = LinearLayoutManager(applicationContext)
-        recyclerView.setLayoutManager(mLayoutManager)
-        recyclerView.setItemAnimator(DefaultItemAnimator())
+        recyclerView.layoutManager = mLayoutManager
+        recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        recyclerView.setAdapter(mAdapter)
+        recyclerView.adapter = mAdapter
 
     }
 
@@ -73,8 +73,8 @@ class ArchiveListActivity : AppCompatActivity(), RecyclerViewClickListener {
     }
 
     override fun onClick(view: View, position: Int) {
-        val id = shoppingList.get(position).id
-        val isArchived = shoppingList.get(position).isArchived
+        val id = shoppingList[position].id
+        val isArchived = shoppingList[position].isArchived
         goToShoppingListDetailsActivity(id, isArchived)
     }
 

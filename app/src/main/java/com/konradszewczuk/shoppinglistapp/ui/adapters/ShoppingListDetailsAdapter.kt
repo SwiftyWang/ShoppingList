@@ -20,24 +20,20 @@ class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementDTO>, va
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val itemView = LayoutInflater.from(parent?.getContext())
+        val itemView = LayoutInflater.from(parent?.context)
                 .inflate(R.layout.item_shopping_list_element, parent, false)
         return ViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val item = list.get(position)
-        holder?.name?.setText(item.name)
+        holder?.name?.text = item.name
         if (item.isCompleted) {
             holder?.isCompleted?.isChecked = true
         }
 
 
-        if (isArchived)
-            holder?.isCompleted?.isEnabled = false
-        else {
-            holder?.isCompleted?.isEnabled = true
-        }
+        holder?.isCompleted?.isEnabled = !isArchived
 
         holder?.isCompleted?.setOnCheckedChangeListener { buttonView, isChecked ->
             item.isCompleted = isChecked
@@ -47,16 +43,10 @@ class ShoppingListDetailsAdapter(val list: ArrayList<ShoppingListElementDTO>, va
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var name: TextView
-        var isCompleted: CheckBox
+        var name: TextView = view.findViewById(R.id.itemName)
+        var isCompleted: CheckBox = view.findViewById(R.id.checkbox)
         private var viewClickListener: ShoppingItemCheckboxListener? = null
-
-
-        init {
-            name = view.findViewById(R.id.itemName)
-            isCompleted = view.findViewById(R.id.checkbox)
-        }
-
+        
     }
 
     fun removeItem(position: Int) {
