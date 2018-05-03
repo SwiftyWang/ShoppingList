@@ -7,7 +7,7 @@ import android.arch.persistence.room.TypeConverters
 import android.content.Context
 
 
-@Database(entities = arrayOf(ShoppingList::class), version = 1)
+@Database(entities = [ShoppingList::class], version = 1)
 @TypeConverters(ShoppingListDatabaseConverters::class)
 abstract class ShoppingListDatabase : RoomDatabase() {
 
@@ -15,7 +15,8 @@ abstract class ShoppingListDatabase : RoomDatabase() {
 
     companion object {
 
-        @Volatile private var INSTANCE: ShoppingListDatabase? = null
+        @Volatile
+        private var INSTANCE: ShoppingListDatabase? = null
 
         fun getInstance(context: Context): ShoppingListDatabase =
                 INSTANCE ?: synchronized(this) {
